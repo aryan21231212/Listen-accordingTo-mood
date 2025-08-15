@@ -1,0 +1,47 @@
+import express from "express";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import cors from "cors"
+
+
+const app = express();
+const port = 3000;
+
+app.use(cors());
+app.use(express.json());
+
+
+app.listen(port,() => {
+    console.log(`Server is running on ${port}`);
+})
+
+app.post("/mood", async (req, res) => {
+    const text = await req.body.text || "";
+
+    if (!text) {
+        return res.status(400).json({ error: "Text is required" });
+    };
+
+
+    try {
+        const genAI = new GoogleGenerativeAI("AIzaSyBmoKbIychQZB3W4pQfyiTabRxbzndnCX4");
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        const prompt = `
+      You are a mood detection AI.
+      Given the text: "${text}",
+      Detect the main mood in ONE word only.
+      Choose from: happy, sad, calm, energetic, romantic, angry, nostalgic, relaxed, hopeful, stressed.
+      Output only the mood word in lowercase.
+    `;
+
+        const result = await model.generateContent(prompt);
+        const mood = result.response.text().trim().toLowerCase();
+
+        res.status(200).json({ mood });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Failed to detect mood" });
+    }
+
+})
+
