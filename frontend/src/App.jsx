@@ -8,12 +8,61 @@ const App = () => {
     return saved ? JSON.parse(saved) : [];
   });
   const [darkMode, setDarkMode] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+
+
+  const [recognition, setRecognition] = useState(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const recognitionInstance = new SpeechRecognition();
+        recognitionInstance.continuous = false;
+        recognitionInstance.interimResults = false;
+        recognitionInstance.lang = 'en-US';
+
+        recognitionInstance.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          settext(prev => prev + ' ' + transcript);
+          setIsListening(false);
+        };
+
+        recognitionInstance.onerror = (event) => {
+          console.error('Speech recognition error', event.error);
+          setIsListening(false);
+        };
+
+        recognitionInstance.onend = () => {
+          if (isListening) {
+            recognitionInstance.start();
+          }
+        };
+
+        setRecognition(recognitionInstance);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (allPlaylist.length > 0) {
       localStorage.setItem("allPlaylist", JSON.stringify(allPlaylist));
     }
   }, [allPlaylist]);
+
+  const toggleListen = () => {
+    if (isListening) {
+      recognition.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognition.start();
+        setIsListening(true);
+      } catch (error) {
+        console.error('Could not start recognition:', error);
+      }
+    }
+  };
 
   const playlist = async (Mood) => {
     if (!Mood) {
@@ -154,7 +203,7 @@ const App = () => {
           width: 60px;
           height: 60px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #8a2be2, #4a00e0);
+          background: ${isListening ? 'linear-gradient(135deg, #ff0000, #ff4500)' : 'linear-gradient(135deg, #8a2be2, #4a00e0)'};
           color: white;
           display: flex;
           align-items: center;
@@ -164,11 +213,38 @@ const App = () => {
           transition: all 0.3s ease;
           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
           border: none;
+          position: relative;
         }
         
         .mic-button:hover {
           transform: scale(1.05);
           box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .mic-button::after {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.2);
+          opacity: ${isListening ? 1 : 0};
+          animation: ${isListening ? 'pulse 1.5s infinite' : 'none'};
+        }
+        
+        @keyframes pulse {
+          0% {
+            transform: scale(0.8);
+            opacity: 0.5;
+          }
+          70% {
+            transform: scale(1.3);
+            opacity: 0;
+          }
+          100% {
+            transform: scale(0.8);
+            opacity: 0;
+          }
         }
         
         .search-button {
@@ -222,6 +298,14 @@ const App = () => {
         
         .toggle-icon {
           font-size: 1.2rem;
+        }
+        
+        .listening-status {
+          color: ${darkMode ? '#ff6b6b' : '#ff0000'};
+          font-size: 0.9rem;
+          margin-top: 0.5rem;
+          text-align: center;
+          height: 1rem;
         }
         
         @media (max-width: 768px) {
@@ -280,7 +364,16 @@ const App = () => {
               className="mood-textarea"
               placeholder="How are you feeling today? Share your mood..."
             />
-            <button className="mic-button">🎤</button>
+            <button 
+              className="mic-button" 
+              onClick={toggleListen}
+              aria-label={isListening ? 'Stop listening' : 'Start listening'}
+            >
+              🎤
+            </button>
+          </div>
+          <div className="listening-status">
+            {isListening ? 'Listening... Speak now' : ''}
           </div>
 
           <button onClick={searchMood} className="search-button">Get Music Recommendations</button>
