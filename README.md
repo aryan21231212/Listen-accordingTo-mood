@@ -28,4 +28,6 @@ With a sleek **UI theme toggler** and smooth animations, the experience feels fr
 
 
 ### Voice Search in Action
-![Voice Search Screenshot](./screenshots/voice-search.png)
+<img width="1676" height="995" alt="Screenshot 2025-08-15 at 10 09 32 PM" src="https://github.com/user-attachments/assets/fd4ad3a7-7f92-4ef6-b52f-98a84c1647fd" />
+
+
