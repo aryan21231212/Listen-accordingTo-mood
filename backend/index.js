@@ -75,9 +75,10 @@ app.post("/mood", async (req, res) => {
         return res.status(400).json({ error: "Text is required" });
     };
 
+    const key = process.env.GEN_AI;
 
     try {
-        const genAI = new GoogleGenerativeAI("AIzaSyBmoKbIychQZB3W4pQfyiTabRxbzndnCX4");
+        const genAI = new GoogleGenerativeAI(`${key}`);
         const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
         const prompt = `
