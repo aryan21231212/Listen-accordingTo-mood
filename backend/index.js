@@ -18,8 +18,8 @@ app.listen(port,() => {
 
 //spotify auth request
 async function getSpotifyToken() {
-    const clientId = process.env.client_id;
-    const clientSecret = process.env.client_Secret;
+    const clientId = process.env.CLIENT_ID;
+    const clientSecret = process.env.CLIENT_SECRET;
   
     const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
   
@@ -40,7 +40,28 @@ async function getSpotifyToken() {
 
 //playlist on basis of mood
 app.post("/playlist",async (req,res)=>{
-    const mood = req.body;
+    const {Mood} = req.body;
+    
+    try {
+        const token = await getSpotifyToken();
+    
+        const response = await fetch(
+          `https://api.spotify.com/v1/search?q=${Mood}&type=playlist&limit=20`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+    
+        const data = await response.json();
+        console.log(data);
+        res.json({"sucess":"playlist"});
+        
+      } catch (error) {
+        console.error("Error fetching Spotify playlists:", error);
+        res.status(500).json({ error: "Failed to fetch playlists" });
+      }
 })
 
 
