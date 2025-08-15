@@ -177,10 +177,8 @@ const Box = ({ playlist }) => {
                   </div>
                 </div>
               </div>
-            ))) :
-          <div className="no-playlist">
-            <p>No playlists found</p>
-          </div>
+            ))) :""
+       
         }
       </div>
     </>
