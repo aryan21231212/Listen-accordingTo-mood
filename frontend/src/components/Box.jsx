@@ -1,10 +1,189 @@
 import React from 'react'
 
-const Box = () => {
+const Box = ({ playlist }) => {
+  console.log(playlist)
   return (
-    <div className='main'>
-        isme hi sab gaane ka recomendation aayega
-    </div>
+    <>
+      <style>
+        {`
+          .main {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+          }
+
+          .playlist-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            gap: 1.5rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+          }
+
+          .playlist-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(15, 23, 42, 0.1);
+            border-color: #cbd5e1;
+          }
+
+          .playlist-image {
+            flex-shrink: 0;
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f1f5f9;
+          }
+
+          .playlist-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+          }
+
+          .playlist-card:hover .playlist-image img {
+            transform: scale(1.05);
+          }
+
+          .playlist-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+          }
+
+          .playlist-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+          }
+
+          .playlist-description {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+          }
+
+          .playlist-link {
+            margin-top: auto;
+          }
+
+          .playlist-link a {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: color 0.2s ease;
+          }
+
+          .playlist-link a:hover {
+            color: #2563eb;
+            text-decoration: underline;
+          }
+
+          .no-playlist {
+            text-align: center;
+            padding: 3rem 1.5rem;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            color: #64748b;
+          }
+
+          .no-playlist p {
+            font-size: 1.1rem;
+            font-weight: 500;
+          }
+
+          /* Mobile Responsive */
+          @media (max-width: 768px) {
+            .playlist-card {
+              flex-direction: column;
+              padding: 1.25rem;
+            }
+
+            .playlist-image {
+              width: 100%;
+              height: 200px;
+              align-self: center;
+            }
+
+            .playlist-content {
+              text-align: center;
+            }
+
+            .playlist-title {
+              font-size: 1.1rem;
+              margin-top: 1rem;
+            }
+
+            .playlist-description {
+              -webkit-line-clamp: 2;
+            }
+          }
+
+          @media (max-width: 480px) {
+            .main {
+              padding: 0.5rem;
+            }
+
+            .playlist-card {
+              padding: 1rem;
+              margin-bottom: 1rem;
+            }
+
+            .playlist-image {
+              height: 150px;
+            }
+          }
+        `}
+      </style>
+
+      <div className='main'>
+        {playlist.playlists != null && playlist.playlists.length > 0 ? (
+          playlist.playlists
+            .filter(p => p?.images?.length > 0 && p?.description?.trim())
+            .map((p, index) => (
+              <div key={index} className="playlist-card">
+                <div className="playlist-image">
+                  <img
+                    src={p.images[0].url}
+                    alt="playlist"
+                  />
+                </div>
+                <div className="playlist-content">
+                  <h3 className="playlist-title">{p.name}</h3>
+                  <p className="playlist-description">{p.description}</p>
+                  <div className="playlist-link">
+                    <a href={p.external_urls.spotify} target="_blank" rel="noopener noreferrer">
+                      View on Spotify →
+                    </a>
+                  </div>
+                </div>
+              </div>
+            ))) :
+          <div className="no-playlist">
+            <p>No playlists found</p>
+          </div>
+        }
+      </div>
+    </>
   )
 }
 

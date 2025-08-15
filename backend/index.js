@@ -55,8 +55,10 @@ app.post("/playlist",async (req,res)=>{
         );
     
         const data = await response.json();
-        console.log(data);
-        res.json({"sucess":"playlist"});
+      
+     let playlists = data.playlists.items;
+  
+        res.json({playlists});
         
       } catch (error) {
         console.error("Error fetching Spotify playlists:", error);

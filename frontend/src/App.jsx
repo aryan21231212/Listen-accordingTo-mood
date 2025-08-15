@@ -1,24 +1,34 @@
-import React, { useState } from 'react'
-import Box from './components/Box.jsx'
+import React, { useState, useEffect } from 'react';
+import Box from './components/Box.jsx';
 
 const App = () => {
   const [text, settext] = useState("");
+  const [allPlaylist, setallPlaylist] = useState(() => {
 
+    const saved = localStorage.getItem("allPlaylist");
+    return saved ? JSON.parse(saved) : [];
+  });
 
+  // Save playlists to localStorage whenever they change
+  useEffect(() => {
+    if (allPlaylist.length > 0) {
+      localStorage.setItem("allPlaylist", JSON.stringify(allPlaylist));
+    }
+  }, [allPlaylist]);
 
-  const playlist  = async (Mood)=>{
+  const playlist = async (Mood) => {
     if (!Mood) {
       alert("No mood selected!");
       return;
     }
 
-    try{
-      const response = await fetch("http://localhost:3000/playlist",{
-        method:"POST",
-        headers:{
-             "Content-Type": "application/json"
+    try {
+      const response = await fetch("http://localhost:3000/playlist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
         },
-        body: JSON.stringify({Mood})
+        body: JSON.stringify({ Mood })
       });
 
       if (!response.ok) {
@@ -27,15 +37,16 @@ const App = () => {
 
       const data = await response.json();
 
+      // Only update if new data is different from existing
+      if (JSON.stringify(data) !== JSON.stringify(allPlaylist)) {
+        setallPlaylist(data);
+      }
+
       console.log("playlist detected:", data);
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Error fetching playlist:", error);
     }
-  }
-
-
-
+  };
 
   const searchMood = async () => {
     if (!text) {
@@ -59,44 +70,37 @@ const App = () => {
       const data = await response.json();
 
       console.log("Mood detected:", data.mood);
-
-
-        playlist(data.mood);
-
-    
-
+      playlist(data.mood);
     } catch (error) {
       console.error("Error fetching mood:", error);
     }
-  }
+  };
 
   return (
     <>
       <div className='hero'>
-        <div className="header-section" style={{marginBottom:"2.4rem"}}>
+        <div className="header-section" style={{ marginBottom: "2.4rem" }}>
           <h1 className='title'>Music Recommendation according to your mood</h1>
           <p className='description'>Discover new music tailored to your taste.</p>
         </div>
-        
-        <Box />
-        
-        <div className="input-container" style={{display:"flex", gap:"1rem"}}>
-          <textarea 
+
+        <Box playlist={allPlaylist} />
+
+        <div className="input-container" style={{ display: "flex", gap: "1rem" }}>
+          <textarea
             value={text}
-            onChange={(event)=> settext(event.target.value)}
-            name="baat" 
+            onChange={(event) => settext(event.target.value)}
+            name="baat"
             className="mood-textarea"
             placeholder="Enter your mood here to get music recommendations..."
           />
-          <div className="mic-button">
-            🎤
-          </div>
+          <div className="mic-button">🎤</div>
         </div>
-        
+
         <button onClick={searchMood} className="search-button">Search</button>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
