@@ -71,7 +71,7 @@ const App = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/playlist", {
+      const response = await fetch("https://listen-accordingto-mood.onrender.com/playlist", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -102,7 +102,7 @@ const App = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/mood", {
+      const response = await fetch("https://listen-accordingto-mood.onrender.com/mood", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
