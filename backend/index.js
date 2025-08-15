@@ -1,19 +1,50 @@
 import express from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import cors from "cors"
+import cors from "cors";
+import dotenv from "dotenv";
 
-
+dotenv.config();
 const app = express();
 const port = 3000;
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json());    
 
 
 app.listen(port,() => {
     console.log(`Server is running on ${port}`);
 })
 
+
+//spotify auth request
+async function getSpotifyToken() {
+    const clientId = process.env.client_id;
+    const clientSecret = process.env.client_Secret;
+  
+    const auth = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+  
+    const res = await fetch("https://accounts.spotify.com/api/token", {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${auth}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: "grant_type=client_credentials",
+    });
+  
+    const data = await res.json();
+    return data.access_token;
+  }
+
+
+
+//playlist on basis of mood
+app.post("/playlist",async (req,res)=>{
+    const mood = req.body;
+})
+
+
+//mood
 app.post("/mood", async (req, res) => {
     const text = await req.body.text || "";
 

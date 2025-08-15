@@ -3,6 +3,13 @@ import Box from './components/Box.jsx'
 
 const App = () => {
   const [text, settext] = useState("");
+  const [Mood,setMood] = useState("");
+
+
+  const 
+
+
+
 
   const searchMood = async () => {
     if (!text) {
@@ -24,7 +31,10 @@ const App = () => {
       }
 
       const data = await response.json();
+      setMood(data.mood);
       console.log("Mood detected:", data.mood);
+
+      playlist(Mood);
 
     } catch (error) {
       console.error("Error fetching mood:", error);
